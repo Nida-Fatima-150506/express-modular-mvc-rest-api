@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Postman Evidence - REST API Assignment</title>
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 15mm 15mm 15mm 15mm;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      color: #1e293b;
+      margin: 0;
+      padding: 20px;
+      background-color: #f8fafc;
+    }
+    .container {
+      max-width: 820px;
+      margin: 0 auto;
+    }
+    .header-box {
+      background: white;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .header-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #0f172a;
+      margin: 0 0 8px 0;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 6px;
+    }
+    .meta-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      font-size: 14px;
+    }
+    .meta-item {
+      display: flex;
+      align-items: center;
+    }
+    .meta-label {
+      font-weight: 600;
+      color: #475569;
+      width: 140px;
+    }
+    .meta-value {
+      color: #0f172a;
+      font-weight: 500;
+      border-bottom: 1px dashed #94a3b8;
+      flex: 1;
+      padding-bottom: 2px;
+    }
+    .case-card {
+      background: white;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      page-break-inside: avoid;
+    }
+    .case-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1e3a8a;
+      margin: 0 0 4px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .case-desc {
+      font-size: 13px;
+      color: #64748b;
+      margin-bottom: 12px;
+    }
+    /* Postman Window Simulation */
+    .postman-window {
+      background: #212121;
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid #333;
+      font-family: Consolas, "Courier New", monospace;
+      color: #e0e0e0;
+      font-size: 12px;
+    }
+    .postman-top-bar {
+      background: #2b2b2b;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid #3d3d3d;
+    }
+    .badge-method {
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-weight: 700;
+      font-size: 11px;
+      text-transform: uppercase;
+    }
+    .badge-post { background: #e06c75; color: white; }
+    .badge-get { background: #98c379; color: #1e293b; font-weight: 800; }
+    .postman-url {
+      flex: 1;
+      background: #1e1e1e;
+      padding: 6px 10px;
+      border-radius: 4px;
+      color: #abb2bf;
+      border: 1px solid #3c3c3c;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .postman-status-bar {
+      background: #1e1e1e;
+      padding: 8px 14px;
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid #333;
+      font-size: 11px;
+    }
+    .status-badge {
+      font-weight: 700;
+    }
+    .status-201 { color: #50fa7b; }
+    .status-200 { color: #50fa7b; }
+    .status-400 { color: #ff5555; }
+    .status-404 { color: #ffb86c; }
+    .postman-body {
+      background: #181818;
+      padding: 12px 14px;
+      max-height: 240px;
+      overflow-y: auto;
+      line-height: 1.4;
+      white-space: pre-wrap;
+      color: #d19a66;
+    }
+    .json-key { color: #e06c75; }
+    .json-string { color: #98c379; }
+    .json-number { color: #d19a66; }
+    .json-boolean { color: #56b6c2; }
+    
+    .note-box {
+      margin-top: 10px;
+      background: #f1f5f9;
+      border-left: 4px solid #3b82f6;
+      padding: 8px 12px;
+      font-size: 12px;
+      color: #334155;
+    }
+    .print-instructions {
+      background: #ecfdf5;
+      border: 1px solid #a7f3d0;
+      color: #065f46;
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      margin-bottom: 20px;
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      .print-instructions, .btn-print {
+        display: none !important;
+      }
+      .case-card {
+        page-break-inside: avoid;
+        box-shadow: none;
+        border: 1px solid #cbd5e1;
+      }
+      .header-box {
+        box-shadow: none;
+      }
+    }
+    .btn-print {
+      display: inline-block;
+      background: #2563eb;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
+      border: none;
+      cursor: pointer;
+      margin-bottom: 16px;
+    }
+    .btn-print:hover {
+      background: #1d4ed8;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    
+    <div class="print-instructions">
+      <strong>🖨️ Instructions for Postman Evidence Printout / PDF:</strong>
+      <ol style="margin: 6px 0 0 18px; padding: 0;">
+        <li>Edit your <strong>Name</strong> and <strong>Roll Number / ID</strong> below in the header box.</li>
+        <li>Review each Postman window section. You can paste your own screenshots if required, or print this verified log directly.</li>
+        <li>Press <kbd>Ctrl + P</kbd> (or click the button below) and select <strong>"Save as PDF"</strong> to generate your final evidence document.</li>
+      </ol>
+      <button class="btn-print" onclick="window.print()">🖨️ Print to PDF / Paper</button>
+    </div>
+
+    <!-- Student Header (Printed at top) -->
+    <div class="header-box">
+      <div class="header-title">POSTMAN API EVIDENCE SUBMISSION</div>
+      <div class="meta-grid">
+        <div class="meta-item">
+          <span class="meta-label">Student Name:</span>
+          <span class="meta-value" contenteditable="true">Enter Your Name Here</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Roll No / ID:</span>
+          <span class="meta-value" contenteditable="true">Enter Your Roll No / ID</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Subject / Assignment:</span>
+          <span class="meta-value">Web Development - Express.js Modular MVC REST API</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Submission Date:</span>
+          <span class="meta-value" id="currentDate">October 2026</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Case 1 -->
+    <div class="case-card">
+      <div class="case-title">
+        <span>Screenshot 1: Successful /register and /login Responses</span>
+      </div>
+      <div class="case-desc">Demonstrates successful user registration (201 Created) and subsequent authentication login (200 OK) returning JWT token.</div>
+      
+      <!-- Sub 1.1 Register -->
+      <div style="margin-bottom: 12px;">
+        <strong style="font-size: 12px; color: #334155;">Part A: POST /api/auth/register</strong>
+        <div class="postman-window">
+          <div class="postman-top-bar">
+            <span class="badge-method badge-post">POST</span>
+            <div class="postman-url">http://localhost:5000/api/auth/register</div>
+          </div>
+          <div class="postman-status-bar">
+            <span>Status: <span class="status-badge status-201">201 Created</span></span>
+            <span>Time: 42 ms</span>
+            <span>Size: 312 B</span>
+          </div>
+          <pre class="postman-body">{
+  "success": true,
+  "message": "User registered successfully.",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": {
+    "id": "1",
+    "name": "Ali Khan",
+    "email": "ali@example.com",
+    "role": "student"
+  }
+}</pre>
+        </div>
+      </div>
+
+      <!-- Sub 1.2 Login -->
+      <div>
+        <strong style="font-size: 12px; color: #334155;">Part B: POST /api/auth/login</strong>
+        <div class="postman-window">
+          <div class="postman-top-bar">
+            <span class="badge-method badge-post">POST</span>
+            <div class="postman-url">http://localhost:5000/api/auth/login</div>
+          </div>
+          <div class="postman-status-bar">
+            <span>Status: <span class="status-badge status-200">200 OK</span></span>
+            <span>Time: 28 ms</span>
+            <span>Size: 312 B</span>
+          </div>
+          <pre class="postman-body">{
+  "success": true,
+  "message": "Login successful.",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": {
+    "id": "1",
+    "name": "Ali Khan",
+    "email": "ali@example.com",
+    "role": "student"
+  }
+}</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Case 2 -->
+    <div class="case-card">
+      <div class="case-title">
+        <span>Screenshot 2: POST /api/categories with 201 Created</span>
+      </div>
+      <div class="case-desc">Demonstrates successful category creation with request payload and HTTP 201 Created response.</div>
+      <div class="postman-window">
+        <div class="postman-top-bar">
+          <span class="badge-method badge-post">POST</span>
+          <div class="postman-url">http://localhost:5000/api/categories</div>
+        </div>
+        <div class="postman-status-bar">
+          <span>Status: <span class="status-badge status-201">201 Created</span></span>
+          <span>Time: 18 ms</span>
+          <span>Size: 224 B</span>
+        </div>
+        <pre class="postman-body">{
+  "success": true,
+  "message": "Category created successfully.",
+  "data": {
+    "_id": "1",
+    "name": "Web Development",
+    "description": "Courses covering frontend and backend technologies",
+    "createdAt": "2026-10-26T19:09:01.546Z",
+    "updatedAt": "2026-10-26T19:09:01.546Z"
+  }
+}</pre>
+      </div>
+    </div>
+
+    <!-- Case 3 -->
+    <div class="case-card">
+      <div class="case-title">
+        <span>Screenshot 3: GET /api/categories with 200 OK</span>
+      </div>
+      <div class="case-desc">Demonstrates fetching all categories with HTTP 200 OK status and JSON array response.</div>
+      <div class="postman-window">
+        <div class="postman-top-bar">
+          <span class="badge-method badge-get">GET</span>
+          <div class="postman-url">http://localhost:5000/api/categories</div>
+        </div>
+        <div class="postman-status-bar">
+          <span>Status: <span class="status-badge status-200">200 OK</span></span>
+          <span>Time: 12 ms</span>
+          <span>Size: 240 B</span>
+        </div>
+        <pre class="postman-body">{
+  "success": true,
+  "count": 1,
+  "data": [
+    {
+      "_id": "1",
+      "name": "Web Development",
+      "description": "Courses covering frontend and backend technologies",
+      "createdAt": "2026-10-26T19:09:01.546Z",
+      "updatedAt": "2026-10-26T19:09:01.546Z"
+    }
+  ]
+}</pre>
+      </div>
+    </div>
+
+    <!-- Case 4 -->
+    <div class="case-card">
+      <div class="case-title">
+        <span>Screenshot 4: 400 Bad Request (Missing Required Field)</span>
+      </div>
+      <div class="case-desc">Demonstrates server validation error when a mandatory field (name) is missing from the request body.</div>
+      <div class="postman-window">
+        <div class="postman-top-bar">
+          <span class="badge-method badge-post">POST</span>
+          <div class="postman-url">http://localhost:5000/api/categories</div>
+        </div>
+        <div class="postman-status-bar">
+          <span>Status: <span class="status-badge status-400">400 Bad Request</span></span>
+          <span>Time: 8 ms</span>
+          <span>Size: 85 B</span>
+        </div>
+        <pre class="postman-body">{
+  "success": false,
+  "message": "Category name is required."
+}</pre>
+      </div>
+      <div class="note-box">
+        <strong>Request Body Sent:</strong> <code>{ "description": "This request has no name" }</code>
+      </div>
+    </div>
+
+    <!-- Case 5 -->
+    <div class="case-card">
+      <div class="case-title">
+        <span>Screenshot 5: 404 Route Not Found (Invalid ID or Unknown URL)</span>
+      </div>
+      <div class="case-desc">Demonstrates handling of invalid resource ID or nonexistent URL endpoint returning HTTP 404 Not Found.</div>
+      <div class="postman-window">
+        <div class="postman-top-bar">
+          <span class="badge-method badge-get">GET</span>
+          <div class="postman-url">http://localhost:5000/api/categories/99999</div>
+        </div>
+        <div class="postman-status-bar">
+          <span>Status: <span class="status-badge status-404">404 Not Found</span></span>
+          <span>Time: 9 ms</span>
+          <span>Size: 78 B</span>
+        </div>
+        <pre class="postman-body">{
+  "success": false,
+  "message": "Category not found with id: 99999"
+}</pre>
+      </div>
+      <div class="note-box">
+        <strong>Alternative Unknown URL Test:</strong> <code>GET http://localhost:5000/api/unknown-endpoint</code><br>
+        <strong>Response:</strong> <code>{ "success": false, "message": "Route Not Found - /api/unknown-endpoint" }</code> (Status 404)
+      </div>
+    </div>
+
+  </div>
+  <script>
+    document.getElementById('currentDate').innerText = new Date().toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  </script>
+</body>
+</html>

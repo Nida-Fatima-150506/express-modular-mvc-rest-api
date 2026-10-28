@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Course Manager - API UI</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
+body{background:#f5f7fb}
+header{background:#111827;color:#fff;padding:16px 24px;display:flex;justify-content:space-between}
+.container{max-width:1100px;margin:20px auto;padding:0 16px;display:grid;grid-template-columns:320px 1fr;gap:16px}
+.card{background:#fff;border-radius:12px;padding:16px;box-shadow:0 4px 12px rgba(0,0,0,.06);margin-bottom:16px}
+input,textarea{width:100%;padding:10px;margin-bottom:10px;border:1px solid #ddd;border-radius:8px}
+button{width:100%;padding:11px;background:#111827;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:700}
+button.sec{background:#fff;color:#111;border:1px solid #ddd}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.item{border:1px solid #eee;padding:10px;border-radius:8px;margin-bottom:8px;background:#fafafa}
+.badge{font-size:10px;background:#e0e7ff;padding:2px 6px;border-radius:10px}
+.tabs{display:flex;gap:8px;margin-bottom:12px}
+.tabs button{width:auto;padding:8px 14px}
+.tabs button.active{background:#4f46e5}
+.hidden{display:none}
+#toast{position:fixed;bottom:20px;right:20px;background:#111;color:#fff;padding:10px 16px;border-radius:8px;display:none}
+</style>
+</head>
+<body>
+<header><h3>📚 Express Modular MVC</h3><span id="userInfo">Not Logged In</span></header>
+<div class="container">
+<div>
+<div class="card">
+<h3>🔐 Auth</h3>
+<input id="name" placeholder="Name">
+<input id="email" placeholder="Email" value="test@test.com">
+<input id="password" placeholder="Password" type="password" value="123456">
+<div class="grid2"><button onclick="register()">Register</button><button onclick="login()" style="background:#4f46e5">Login</button></div>
+<button class="sec" onclick="logout()" style="margin-top:8px">Logout</button>
+<div id="tokenBox" style="font-size:10px;word-break:break-all;background:#f3f4f6;padding:6px;border-radius:6px;margin-top:8px;display:none"></div>
+</div>
+<div class="card"><h3>➕ Category</h3><input id="catName" placeholder="Web Development"><textarea id="catDesc" placeholder="Description"></textarea><button onclick="addCategory()">Create (201)</button></div>
+<div class="card"><h3>➕ Course</h3><input id="courseTitle" placeholder="Title"><textarea id="courseDesc" placeholder="Desc"></textarea><input id="courseCatId" placeholder="Category ID"><input id="coursePrice" type="number" placeholder="Price"><button onclick="addCourse()" style="background:#059669">Create Course</button></div>
+</div>
+<div>
+<div class="tabs"><button class="active" id="tabCatBtn" onclick="switchTab('cat')">Categories (200)</button><button id="tabCourseBtn" onclick="switchTab('course')">Courses</button></div>
+<div id="tabCat"><div class="card"><h3>Categories - GET /api/categories</h3><button class="sec" style="width:auto" onclick="loadCategories()">Refresh</button><div id="categoriesList" style="margin-top:10px">Login & Refresh</div></div></div>
+<div id="tabCourse" class="hidden"><div class="card"><h3>Courses - GET /api/courses</h3><button class="sec" style="width:auto" onclick="loadCourses()">Refresh</button><div id="coursesList" style="margin-top:10px">Login & Refresh</div></div></div>
+<div class="card" style="background:#fffbeb;border:1px solid #fcd34d"><h3>⚠️ Test Errors</h3><div class="grid2"><button class="sec" onclick="test400()">Test 400</button><button class="sec" onclick="test404()">Test 404</button></div><p style="font-size:11px;margin-top:6px">For Screenshot 4 & 5</p></div>
+</div>
+</div>
+<div id="toast"></div>
+<script>
+const API='http://localhost:5000/api';
+let token=localStorage.getItem('token')||'';
+let categories=[];
+function toast(m,e=false){const t=document.getElementById('toast');t.textContent=m;t.style.display='block';t.style.background=e?'#dc2626':'#111';setTimeout(()=>t.style.display='none',3000)}
+function updateUI(){if(token){document.getElementById('tokenBox').style.display='block';document.getElementById('tokenBox').textContent=token.substring(0,60)+'...';document.getElementById('userInfo').textContent='✅ Logged In';}else{document.getElementById('tokenBox').style.display='none';document.getElementById('userInfo').textContent='Not Logged In';}}
+async function register(){try{const r=await fetch(API+'/auth/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:document.getElementById('name').value,email:document.getElementById('email').value,password:document.getElementById('password').value})});const d=await r.json();toast('Register '+r.status);alert('REGISTER\nStatus:'+r.status+'\n'+JSON.stringify(d,null,2));}catch(e){toast('API not running!',true)}}
+async function login(){try{const r=await fetch(API+'/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:document.getElementById('email').value,password:document.getElementById('password').value})});const d=await r.json();if(r.ok&&d.token){token=d.token;localStorage.setItem('token',token);updateUI();toast('Login 200 OK');loadCategories();loadCourses();}else{toast('Login Failed',true);alert(JSON.stringify(d,null,2));}}catch(e){toast('API not running!',true)}}
+function logout(){token='';localStorage.removeItem('token');updateUI();toast('Logged out');}
+async function addCategory(){if(!token)return alert('Login first');const r=await fetch(API+'/categories',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({name:document.getElementById('catName').value,description:document.getElementById('catDesc').value})});const d=await r.json();alert('CREATE CATEGORY\nStatus: '+r.status+' (201 Expected)\n'+JSON.stringify(d,null,2));if(r.status===201)loadCategories();}
+async function loadCategories(){if(!token)return toast('Login first',true);const r=await fetch(API+'/categories',{headers:{'Authorization':'Bearer '+token}});const d=await r.json();categories=d.data||d.categories||d||[];const list=document.getElementById('categoriesList');if(!categories.length){list.innerHTML='No categories';return;}list.innerHTML=categories.map(c=>`<div class="item"><span class="badge">${c._id||c.id}</span><b> ${c.name}</b><div style="font-size:12px">${c.description||''}</div><div class="grid2" style="margin-top:6px"><button class="sec" onclick="copyId('${c._id||c.id}')">Copy ID</button><button onclick="delCat('${c._id||c.id}')" style="background:#dc2626">Delete</button></div></div>`).join('');}
+async function addCourse(){if(!token)return alert('Login first');const r=await fetch(API+'/courses',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({title:document.getElementById('courseTitle').value,description:document.getElementById('courseDesc').value,category:document.getElementById('courseCatId').value,price:document.getElementById('coursePrice').value})});const d=await r.json();alert('CREATE COURSE\nStatus:'+r.status+'\n'+JSON.stringify(d,null,2));if(r.ok)loadCourses();}
+async function loadCourses(){if(!token)return;const r=await fetch(API+'/courses',{headers:{'Authorization':'Bearer '+token}});const d=await r.json();const courses=d.data||d.courses||d||[];const list=document.getElementById('coursesList');if(!courses.length){list.innerHTML='No courses';return;}list.innerHTML=courses.map(c=>`<div class="item"><b>${c.title||c.name}</b><div style="font-size:12px">${c.description||''} - $${c.price||0}</div></div>`).join('');}
+function copyId(id){document.getElementById('courseCatId').value=id;toast('ID Copied to Course Form');}
+async function delCat(id){if(!confirm('Delete?'))return;const r=await fetch(API+'/categories/'+id,{method:'DELETE',headers:{'Authorization':'Bearer '+token}});const d=await r.json();toast('Deleted '+r.status);loadCategories();}
+async function test400(){if(!token)return alert('Login first');const r=await fetch(API+'/categories',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({name:''})});const d=await r.json();alert('400 BAD REQUEST TEST (Screenshot 4)\nStatus:'+r.status+'\n'+JSON.stringify(d,null,2));}
+async function test404(){if(!token)return alert('Login first');const r=await fetch(API+'/categories/1234567890abcdef12345678',{headers:{'Authorization':'Bearer '+token}});const d=await r.json();alert('404 NOT FOUND TEST (Screenshot 5)\nStatus:'+r.status+'\n'+JSON.stringify(d,null,2));}
+function switchTab(t){document.getElementById('tabCat').classList.toggle('hidden',t!=='cat');document.getElementById('tabCourse').classList.toggle('hidden',t!=='course');document.getElementById('tabCatBtn').classList.toggle('active',t==='cat');document.getElementById('tabCourseBtn').classList.toggle('active',t==='course');}
+updateUI();
+</script>
+</body>
+</html>
